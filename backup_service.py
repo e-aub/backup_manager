@@ -2,15 +2,17 @@ import os
 import tarfile
 import time
 from datetime import datetime
+from utils.logger import RotatingLogger
+from utils.aop import log_exceptions
 
 SCHEDULES_FILE = "backup_schedules.txt"
 BACKUPS_DIR = "./backups"
-
+looger = RotatingLogger(log_dir="./logs/backup_service")
 
 def ensure_backups_dir():
     if not os.path.exists(BACKUPS_DIR):
         os.makedirs(BACKUPS_DIR)
-        print(f"Created backups directory: {BACKUPS_DIR}")
+        looger.log(f"Created backups directory: {BACKUPS_DIR}")
 
 
 def read_schedules():
@@ -33,26 +35,22 @@ def read_schedules():
                 })
     return schedules
 
-
+@log_exceptions("create_backup")
 def create_backup(path_to_save, backup_name):
 
     if not os.path.exists(path_to_save):
-        print(f"Error: Path does not exist: {path_to_save}")
+        looger.log(f"Error: Path does not exist: {path_to_save}")
         return False
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_filename = f"{backup_name}_{timestamp}.tar.gz"
+    backup_filename = f"{backup_name}.tar"
     backup_path = os.path.join(BACKUPS_DIR, backup_filename)
     
-    try:
-        with tarfile.open(backup_path, "w:gz") as tar:
-            tar.add(path_to_save, arcname=os.path.basename(path_to_save))
-        print(f"Backup created successfully: {backup_path}")
-        return True
-    except Exception as e:
-        print(f"Error creating backup: {e}")
-        return False
 
+    with tarfile.open(backup_path, "w:gz") as tar:
+        tar.add(path_to_save, arcname=os.path.basename(path_to_save))
+    looger.log(f"Backup created successfully: {backup_path}")
+    return True
 
 def check_and_run_backups():
     current_time = datetime.now().strftime("%H:%M")
@@ -60,15 +58,15 @@ def check_and_run_backups():
     
     for schedule in schedules:
         if schedule["time"] == current_time:
-            print(f"Running scheduled backup: {schedule['name']}")
+            looger.log(f"Running scheduled backup: {schedule['name']}")
             create_backup(schedule["path"], schedule["name"])
 
 
 def main():
-    print("Backup Service started.")
-    print(f"Reading schedules from: {SCHEDULES_FILE}")
-    print(f"Saving backups to: {BACKUPS_DIR}")
-    print("-" * 40)
+    looger.log("Backup Service started.")
+    looger.log(f"Reading schedules from: {SCHEDULES_FILE}")
+    looger.log(f"Saving backups to: {BACKUPS_DIR}")
+    looger.log("-" * 40)
     
     ensure_backups_dir()
     
