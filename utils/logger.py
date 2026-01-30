@@ -1,8 +1,7 @@
 import os
 import datetime
-import time
 
-LOG_DIR = "../logs"
+LOG_DIR = "logs"
 MAX_LOG_SIZE = 1024 
 
 class RotatingLogger:
@@ -13,7 +12,8 @@ class RotatingLogger:
 
         self.start_time = datetime.datetime.now()
         self.current_file = os.path.join(self.log_dir, "latest.log")
-
+        with open(self.current_file, "a") as f:
+            pass 
         self.rotation_index = 0
 
     def _timestamp(self):
@@ -50,6 +50,3 @@ class RotatingLogger:
 
 logger = RotatingLogger()
 log = logger.log
-while True:
-    log("This is a test log message.")
-    time.sleep(1)
