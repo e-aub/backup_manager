@@ -4,7 +4,7 @@ import sys
 from utils.logger import log
 from utils.aop import log_exceptions
 # from utils.schedule import add_schedule, list_schedules, delete_schedule
-# from utils.process import start_service, stop_service
+from utils.process import start_service, stop_service
 # from utils.backup import list_backups
 
 
@@ -30,11 +30,40 @@ def main():
     command = sys.argv[1]
 
     if command == "start":
-        raise Exception("Simulated startup failure for testing purposes")
-        # start_service()
-        log("backup_service started")
+        start_service()
 
-   
+    elif command == "stop":
+        stop_service()
+
+    elif command == "create":
+        if len(sys.argv) != 3:
+            print("Error: missing schedule")
+            usage()
+            return
+        schedule = sys.argv[2]
+        add_schedule(schedule)
+        log(f"New schedule added: {schedule}")
+
+    elif command == "list":
+        schedules = list_schedules()
+        for i, s in enumerate(schedules):
+            print(f"{i}: {s}")
+        log("Show schedules list")
+
+    elif command == "delete":
+        if len(sys.argv) != 3 or not sys.argv[2].isdigit():
+            print("Error: invalid index")
+            usage()
+            return
+        index = int(sys.argv[2])
+        delete_schedule(index)
+        log(f"Schedule at index {index} deleted")
+
+    elif command == "backups":
+        backups = list_backups()
+        for b in backups:
+            print(b)
+        log("Show backups list")
 
     else:
         print(f"Unknown command: {command}")
