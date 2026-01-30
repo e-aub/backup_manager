@@ -1,9 +1,8 @@
 import traceback
 from functools import wraps
-from utils.logger import log
 
 
-def log_exceptions(context: str = ""):
+def log_exceptions(log, context: str = ""):
     """
     AOP decorator that logs uncaught exceptions and lets them bubble up.
     """

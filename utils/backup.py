@@ -4,7 +4,7 @@ from utils.aop import log_exceptions
 
 BACKUP_DIR = "backups"
 
-@log_exceptions("list_backups")
+@log_exceptions(log, "list_backups")
 def list_backups():
     if not os.path.exists(BACKUP_DIR):
         msg = "Error: can't find backups directory"

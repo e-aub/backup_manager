@@ -4,7 +4,7 @@ from utils.aop import log_exceptions
 
 SCHEDULE_FILE = "backup_schedules.txt"
 
-@log_exceptions("add_schedule")
+@log_exceptions(log, "add_schedule")
 def add_schedule(schedule: str):
     parts = schedule.strip().split(";")
     if len(parts) != 3:
@@ -21,7 +21,7 @@ def add_schedule(schedule: str):
     log(msg)
 
 
-@log_exceptions("list_schedules")
+@log_exceptions(log, "list_schedules")
 def list_schedules():
     if not os.path.exists(SCHEDULE_FILE):
         msg = "Error: can't find backup_schedules.txt"
@@ -36,7 +36,7 @@ def list_schedules():
     return schedules
 
 
-@log_exceptions("delete_schedule")
+@log_exceptions(log, "delete_schedule")
 def delete_schedule(index: int):
     if not os.path.exists(SCHEDULE_FILE):
         msg = "Error: can't find backup_schedules.txt"

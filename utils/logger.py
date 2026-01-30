@@ -1,7 +1,7 @@
 import os
 import datetime
 
-LOG_DIR = "logs"
+LOG_DIR = "logs/backup_manager"
 MAX_LOG_SIZE = 1024 
 
 class RotatingLogger:

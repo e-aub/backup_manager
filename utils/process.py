@@ -6,7 +6,7 @@ from utils.aop import log_exceptions
 
 PID_FILE = "backup_service.pid"
 
-@log_exceptions("start_service")
+@log_exceptions(log, "start_service")
 def start_service():
     if os.path.exists(PID_FILE):
         msg = "Error: backup_service already running"
@@ -26,7 +26,7 @@ def start_service():
     log(msg)
 
 
-@log_exceptions("stop_service")
+@log_exceptions(log, "stop_service")
 def stop_service():
     if not os.path.exists(PID_FILE):
         msg = "Error: backup_service not running"

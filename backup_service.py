@@ -7,14 +7,15 @@ from utils.aop import log_exceptions
 
 SCHEDULES_FILE = "backup_schedules.txt"
 BACKUPS_DIR = "./backups"
-looger = RotatingLogger(log_dir="./logs/backup_service")
+logger = RotatingLogger(log_dir="./logs/backup_service")
 
+@log_exceptions(logger.log, "ensure_backups_dir")
 def ensure_backups_dir():
     if not os.path.exists(BACKUPS_DIR):
         os.makedirs(BACKUPS_DIR)
-        looger.log(f"Created backups directory: {BACKUPS_DIR}")
+        logger.log(f"Created backups directory: {BACKUPS_DIR}")
 
-
+@log_exceptions(logger.log, "read_schedules")
 def read_schedules():
     schedules = []
     if not os.path.exists(SCHEDULES_FILE):
@@ -35,21 +36,20 @@ def read_schedules():
                 })
     return schedules
 
-@log_exceptions("create_backup")
+@log_exceptions(logger.log, "create_backup")
 def create_backup(path_to_save, backup_name):
 
     if not os.path.exists(path_to_save):
-        looger.log(f"Error: Path does not exist: {path_to_save}")
+        logger.log(f"Error: Path does not exist: {path_to_save}")
         return False
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_filename = f"{backup_name}.tar"
     backup_path = os.path.join(BACKUPS_DIR, backup_filename)
     
 
     with tarfile.open(backup_path, "w:gz") as tar:
         tar.add(path_to_save, arcname=os.path.basename(path_to_save))
-    looger.log(f"Backup created successfully: {backup_path}")
+    logger.log(f"Backup created successfully: {backup_path}")
     return True
 
 def check_and_run_backups():
@@ -58,15 +58,15 @@ def check_and_run_backups():
     
     for schedule in schedules:
         if schedule["time"] == current_time:
-            looger.log(f"Running scheduled backup: {schedule['name']}")
+            logger.log(f"Running scheduled backup: {schedule['name']}")
             create_backup(schedule["path"], schedule["name"])
 
 
 def main():
-    looger.log("Backup Service started.")
-    looger.log(f"Reading schedules from: {SCHEDULES_FILE}")
-    looger.log(f"Saving backups to: {BACKUPS_DIR}")
-    looger.log("-" * 40)
+    logger.log("Backup Service started.")
+    logger.log(f"Reading schedules from: {SCHEDULES_FILE}")
+    logger.log(f"Saving backups to: {BACKUPS_DIR}")
+    logger.log("-" * 40)
     
     ensure_backups_dir()
     

@@ -18,7 +18,7 @@ def usage():
         "  backup_manager.py --help\n"
     )
 
-@log_exceptions("backup_manager command")
+@log_exceptions(log, "backup_manager command")
 def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("--help", "-h"):
         usage()
